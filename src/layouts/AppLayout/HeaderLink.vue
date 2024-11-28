@@ -7,5 +7,5 @@ const { to } = defineProps<{
 </script>
 
 <template>
-  <RouterLink :to="to" class="p-2"><slot /></RouterLink>
+  <RouterLink :to="to" class="pointer-events-auto p-2"><slot /></RouterLink>
 </template>

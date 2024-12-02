@@ -71,6 +71,12 @@ const handleCloseProjectModal = () => {
   });
 };
 
+const handleKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Escape' && openedProjectId.value !== null) {
+    handleCloseProjectModal();
+  }
+};
+
 onMounted(() => {
   const setupScroll = () => {
     lenis.options.infinite = true;
@@ -150,6 +156,7 @@ onMounted(() => {
     revealImages(images);
 
     window.addEventListener('resize', () => updateGalleryHeight(images));
+    document.addEventListener('keydown', handleKeydown);
   };
 
   init();
@@ -157,6 +164,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   lenis.options.infinite = false;
+  document.removeEventListener('keydown', handleKeydown);
 });
 </script>
 

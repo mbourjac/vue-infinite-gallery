@@ -12,12 +12,14 @@ import CustomEase from 'gsap/CustomEase';
 import { useLenis } from '@/composables/use-lenis';
 import { useGalleryProjects } from '@/composables/use-gallery-projects';
 import { PROJECTS } from '@/constants';
+import ProjectModal from './ProjectModal.vue';
+import type { Project } from '@/types';
 
 const { injectLenis } = useLenis();
 const lenis = injectLenis();
 
 const { galleryProjects, IMAGES_PER_COLUMN } = useGalleryProjects();
-const openedProjectId = ref<string | null>(null);
+const openedProjectId = ref<Project['id'] | null>(null);
 
 const galleryHeight = ref(0);
 const scrollOffset = ref(0);
@@ -28,39 +30,38 @@ const openedProject = computed(() =>
 
 const columnRefs = useTemplateRef('columns');
 const imageRefs = useTemplateRef('images');
-const modalBackgroundRef = useTemplateRef('modal-background');
-const modalRef = useTemplateRef('modal');
+const projectModalRef = useTemplateRef('project-modal');
 
-const handleOpenModal = async (id: string) => {
+const handleOpenProjectModal = async (id: string) => {
   openedProjectId.value = id;
 
   await nextTick();
 
-  if (!modalBackgroundRef.value || !modalRef.value) return;
+  if (!projectModalRef.value) return;
 
   gsap.fromTo(
-    modalBackgroundRef.value,
+    projectModalRef.value.modalBackgroundRef,
     { opacity: 0 },
     { opacity: 1, duration: 0.4, ease: 'power2.out' }
   );
 
   gsap.fromTo(
-    modalRef.value,
+    projectModalRef.value.modalRef,
     { y: '100%' },
     { y: '0%', duration: 0.5, ease: 'power3.out' }
   );
 };
 
-const handleCloseModal = () => {
-  if (!modalBackgroundRef.value || !modalRef.value) return;
+const handleCloseProjectModal = () => {
+  if (!projectModalRef.value) return;
 
-  gsap.to(modalBackgroundRef.value, {
+  gsap.to(projectModalRef.value.modalBackgroundRef, {
     opacity: 0,
     duration: 0.4,
     ease: 'power2.in',
   });
 
-  gsap.to(modalRef.value, {
+  gsap.to(projectModalRef.value.modalRef, {
     y: '100%',
     duration: 0.5,
     ease: 'power3.in',
@@ -181,7 +182,7 @@ onUnmounted(() => {
           v-for="({ id, title, coverUrl }, itemIndex) in column"
           :key="`${columnIndex}-${itemIndex}`"
           ref="images"
-          @click="() => handleOpenModal(id)"
+          @click="() => handleOpenProjectModal(id)"
           class="group absolute w-full py-[2vw]"
         >
           <div
@@ -197,45 +198,10 @@ onUnmounted(() => {
       </div>
     </div>
   </div>
-  <template v-if="openedProject">
-    <div class="fixed inset-0 flex items-end">
-      <div
-        ref="modal-background"
-        @click="handleCloseModal"
-        class="absolute inset-0 bg-black/40"
-      ></div>
-      <div
-        ref="modal"
-        class="relative z-10 h-[calc(100vh-4rem)] w-full rounded-t-3xl bg-white px-[8vw] py-[12vh]"
-      >
-        <button @click="handleCloseModal" class="absolute right-0 top-0 p-6">
-          Close
-        </button>
-        <div class="flex h-full gap-[8vw]">
-          <img
-            :src="openedProject.coverUrl"
-            class="aspect-[4/5] h-full rounded-2xl object-cover"
-          />
-          <div>
-            <div class="flex w-[80%] flex-col gap-12 pt-[6vh]">
-              <div class="flex flex-col gap-4">
-                <h2 class="text-[4vw] font-bold leading-none">
-                  {{ openedProject.title }}
-                </h2>
-                <h3 class="text-[1.75vw] font-medium">
-                  {{ openedProject.tagline }}
-                </h3>
-              </div>
-              <p>{{ openedProject.description }}</p>
-              <RouterLink
-                :to="{ name: 'project', params: { slug: openedProject.id } }"
-                class="w-fit rounded-full bg-zinc-200 px-4 py-2 text-sm transition-colors hover:bg-black hover:text-zinc-100"
-                >View full project</RouterLink
-              >
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </template>
+  <ProjectModal
+    v-if="openedProject"
+    ref="project-modal"
+    :openedProject="openedProject"
+    @close-modal="handleCloseProjectModal"
+  />
 </template>

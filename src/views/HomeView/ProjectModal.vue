@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useTrapFocus } from '@/composables/use-trap-focus';
 import type { Project } from '@/types';
 import { useTemplateRef } from 'vue';
 
@@ -9,12 +10,14 @@ defineProps<{
 const modalBackgroundRef = useTemplateRef('modal-background');
 const modalRef = useTemplateRef('modal');
 
+const emit = defineEmits(['closeModal']);
+
 defineExpose({
   modalBackgroundRef,
   modalRef,
 });
 
-const emit = defineEmits(['closeModal']);
+useTrapFocus(modalRef);
 </script>
 
 <template>

@@ -109,13 +109,34 @@ onMounted(() => {
     });
   };
 
-  const updateColumnPositions = (columns: HTMLDivElement[]) => {
+  const updateAccessibilityAttributes = (images: HTMLButtonElement[]) => {
+    images.forEach((image) => {
+      const { top, bottom } = image.getBoundingClientRect();
+      const isVisible = top >= 0 && bottom <= window.innerHeight;
+
+      image.tabIndex = isVisible ? 0 : -1;
+      image.setAttribute('aria-hidden', isVisible ? 'false' : 'true');
+    });
+  };
+
+  const updateColumnPositions = (
+    columns: HTMLDivElement[],
+    images: HTMLButtonElement[]
+  ) => {
+    columns.forEach((column, columnIndex) => {
+      if (columnIndex % 2 === 1) {
+        column.style.transform = `translateY(-${scrollOffset.value}px)`;
+      }
+    });
+
     scrollOffset.value =
       (lenis.dimensions.scrollHeight -
         lenis.dimensions.height -
         lenis.actualScroll) *
       2;
-    requestAnimationFrame(() => updateColumnPositions(columns));
+
+    updateAccessibilityAttributes(images);
+    requestAnimationFrame(() => updateColumnPositions(columns, images));
   };
 
   const revealImages = (images: HTMLButtonElement[]) => {
@@ -152,7 +173,7 @@ onMounted(() => {
     setupScroll();
     updateGalleryHeight(images);
     setupImagePositions(images);
-    requestAnimationFrame(() => updateColumnPositions(columns));
+    requestAnimationFrame(() => updateColumnPositions(columns, images));
     revealImages(images);
 
     window.addEventListener('resize', () => updateGalleryHeight(images));

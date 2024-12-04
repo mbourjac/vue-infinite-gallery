@@ -4,8 +4,9 @@ import AppLayout from '@/layouts/AppLayout/AppLayout.vue';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 import CustomEase from 'gsap/CustomEase';
+import Observer from 'gsap/Observer';
 
-gsap.registerPlugin(ScrollTrigger, CustomEase);
+gsap.registerPlugin(ScrollTrigger, CustomEase, Observer);
 </script>
 
 <template>

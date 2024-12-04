@@ -10,15 +10,15 @@ import {
 import gsap from 'gsap';
 import CustomEase from 'gsap/CustomEase';
 import { useLenis } from '@/composables/use-lenis';
-import { useGalleryProjects } from '@/composables/use-gallery-projects';
 import { PROJECTS } from '@/constants';
 import ProjectModal from './ProjectModal.vue';
 import type { Project } from '@/types';
+import { useProjectGroups } from '@/composables/use-project-groups';
 
 const { injectLenis } = useLenis();
 const lenis = injectLenis();
 
-const { galleryProjects, IMAGES_PER_COLUMN } = useGalleryProjects();
+const { projectGroups, PROJECTS_PER_GROUP } = useProjectGroups();
 const openedProjectId = ref<Project['id'] | null>(null);
 
 const galleryHeight = ref(0);
@@ -28,7 +28,7 @@ const openedProject = computed(() =>
   PROJECTS.find(({ id }) => id === openedProjectId.value)
 );
 
-const columnRefs = useTemplateRef('columns');
+const groupRefs = useTemplateRef('groups');
 const imageRefs = useTemplateRef('images');
 const projectModalRef = useTemplateRef('project-modal');
 
@@ -86,25 +86,26 @@ onMounted(() => {
   const updateGalleryHeight = (images: HTMLButtonElement[]) => {
     const imagesHeight = images[0].offsetHeight;
 
-    galleryHeight.value = imagesHeight * IMAGES_PER_COLUMN + window.innerHeight;
+    galleryHeight.value =
+      imagesHeight * PROJECTS_PER_GROUP + window.innerHeight;
   };
 
-  // Determine the column the image belongs to
-  const getImageColumnIndex = (imageIndex: number) =>
-    Math.floor(imageIndex / (IMAGES_PER_COLUMN * 2));
+  // Determine the group the image belongs to
+  const getImageGroupIndex = (imageIndex: number) =>
+    Math.floor(imageIndex / (PROJECTS_PER_GROUP * 2));
 
-  // Determine the position of the image within its column
-  const getImageIndexInColumn = (imageIndex: number) =>
-    imageIndex % (IMAGES_PER_COLUMN * 2);
+  // Determine the position of the image within its group
+  const getImageIndexInGroup = (imageIndex: number) =>
+    imageIndex % (PROJECTS_PER_GROUP * 2);
 
   const setupImagePositions = (images: HTMLButtonElement[]) => {
     images.forEach((image, imageIndex) => {
-      const columnIndex = getImageColumnIndex(imageIndex);
-      const indexInColumn = getImageIndexInColumn(imageIndex);
-      const yPercentOffset = columnIndex % 2 === 0 ? 10 : 560;
+      const groupIndex = getImageGroupIndex(imageIndex);
+      const indexInGroup = getImageIndexInGroup(imageIndex);
+      const yPercentOffset = groupIndex % 2 === 0 ? 10 : 560;
 
       gsap.set(image, {
-        yPercent: indexInColumn * 100 + yPercentOffset,
+        yPercent: indexInGroup * 100 + yPercentOffset,
       });
     });
   };
@@ -119,13 +120,13 @@ onMounted(() => {
     });
   };
 
-  const updateColumnPositions = (
-    columns: HTMLDivElement[],
+  const updateGroupPositions = (
+    groups: HTMLDivElement[],
     images: HTMLButtonElement[]
   ) => {
-    columns.forEach((column, columnIndex) => {
-      if (columnIndex % 2 === 1) {
-        column.style.transform = `translateY(-${scrollOffset.value}px)`;
+    groups.forEach((group, groupIndex) => {
+      if (groupIndex % 2 === 1) {
+        group.style.transform = `translateY(-${scrollOffset.value}px)`;
       }
     });
 
@@ -136,7 +137,7 @@ onMounted(() => {
       2;
 
     updateAccessibilityAttributes(images);
-    requestAnimationFrame(() => updateColumnPositions(columns, images));
+    requestAnimationFrame(() => updateGroupPositions(groups, images));
   };
 
   const revealImages = (images: HTMLButtonElement[]) => {
@@ -149,10 +150,10 @@ onMounted(() => {
     CustomEase.create('popping', '.16,1,.3,1');
 
     images.forEach((image, imageIndex) => {
-      const columnIndex = getImageColumnIndex(imageIndex);
-      const indexInColumn = getImageIndexInColumn(imageIndex);
+      const groupIndex = getImageGroupIndex(imageIndex);
+      const indexInGroup = getImageIndexInGroup(imageIndex);
       const animationOrder =
-        columnIndex * IMAGES_PER_COLUMN + (indexInColumn % 2);
+        groupIndex * PROJECTS_PER_GROUP + (indexInGroup % 2);
 
       gsap.to(image, {
         opacity: 1,
@@ -165,15 +166,15 @@ onMounted(() => {
   };
 
   const init = () => {
-    const columns = columnRefs.value;
+    const groups = groupRefs.value;
     const images = imageRefs.value;
 
-    if (!columns || !images) return;
+    if (!groups || !images) return;
 
     setupScroll();
     updateGalleryHeight(images);
     setupImagePositions(images);
-    requestAnimationFrame(() => updateColumnPositions(columns, images));
+    requestAnimationFrame(() => updateGroupPositions(groups, images));
     revealImages(images);
 
     window.addEventListener('resize', () => updateGalleryHeight(images));
@@ -196,20 +197,20 @@ onUnmounted(() => {
       :style="{ height: galleryHeight + 'px' }"
     >
       <div
-        v-for="(column, columnIndex) in galleryProjects"
-        :key="columnIndex"
-        ref="columns"
+        v-for="(projectsGroup, projectsGroupIndex) in projectGroups"
+        :key="projectsGroupIndex"
+        ref="groups"
         class="relative"
         :style="{
           transform:
-            columnIndex % 2 === 1
+            projectsGroupIndex % 2 === 1
               ? `translateY(-${scrollOffset}px)`
               : 'initial',
         }"
       >
         <button
-          v-for="({ id, title, coverUrl }, itemIndex) in column"
-          :key="`${columnIndex}-${itemIndex}`"
+          v-for="({ id, title, coverUrl }, projectIndex) in projectsGroup"
+          :key="`${projectsGroupIndex}-${projectIndex}`"
           ref="images"
           @click="() => handleOpenProjectModal(id)"
           class="group absolute w-full py-[2vw]"

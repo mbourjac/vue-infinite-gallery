@@ -6,3 +6,8 @@ export type Project = {
   tags: string[];
   description: string;
 };
+
+export type Position = {
+  x: number;
+  y: number;
+};

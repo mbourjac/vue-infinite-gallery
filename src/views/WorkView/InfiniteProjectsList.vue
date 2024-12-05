@@ -3,11 +3,13 @@ import { onMounted, onUnmounted, useTemplateRef } from 'vue';
 import gsap from 'gsap';
 import Observer from 'gsap/Observer';
 import { createHorizontalLoop } from '@/lib/gsap';
-import type { Project } from '@/types';
+import type { Position, Project } from '@/types';
+import ProjectCover from './ProjectCover.vue';
 
 const { observerTarget, isReversed } = defineProps<{
   projects: Project[];
   hoveredProject: Project | null;
+  coverPosition: Position;
   observerTarget: HTMLElement | null;
   isReversed?: boolean;
 }>();
@@ -66,6 +68,7 @@ onUnmounted(() => {
         {
           'opacity-50':
             hoveredProject !== null && hoveredProject.id !== project.id,
+          'z-10': hoveredProject?.id === project.id,
         },
       ]"
     >
@@ -87,5 +90,9 @@ onUnmounted(() => {
         </ul>
       </RouterLink>
     </li>
+    <ProjectCover
+      :url="hoveredProject?.coverUrl ?? null"
+      :position="coverPosition"
+    />
   </ul>
 </template>

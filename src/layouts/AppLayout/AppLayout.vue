@@ -2,14 +2,16 @@
 import TheLogo from '@/components/TheLogo.vue';
 import { useLenis } from '@/composables/use-lenis';
 import HeaderLink from './HeaderLink.vue';
+import { usePageBackground } from '@/composables/use-page-background';
 
+const backgroundColor = usePageBackground();
 const { initLenis } = useLenis();
 
 initLenis();
 </script>
 
 <template>
-  <div class="bg-white">
+  <div class="min-h-screen" :style="{ backgroundColor }">
     <header
       class="pointer-events-none fixed top-0 z-20 flex w-full items-center justify-between px-6 py-3 text-white mix-blend-difference"
     >

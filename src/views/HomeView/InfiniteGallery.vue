@@ -8,7 +8,6 @@ import {
   computed,
 } from 'vue';
 import gsap from 'gsap';
-import CustomEase from 'gsap/CustomEase';
 import { useLenis } from '@/composables/use-lenis';
 import { PROJECTS } from '@/constants';
 import ProjectModal from './ProjectModal.vue';
@@ -147,8 +146,6 @@ onMounted(() => {
       scale: 0.4,
     });
 
-    CustomEase.create('popping', '.16,1,.3,1');
-
     images.forEach((image, imageIndex) => {
       const groupIndex = getImageGroupIndex(imageIndex);
       const indexInGroup = getImageIndexInGroup(imageIndex);
@@ -159,8 +156,8 @@ onMounted(() => {
         opacity: 1,
         scale: 1,
         duration: 0.8,
-        delay: 0.8 + 0.025 * animationOrder,
-        ease: 'popping',
+        delay: 0.25 + 0.025 * animationOrder,
+        ease: 'custom1',
       });
     });
   };

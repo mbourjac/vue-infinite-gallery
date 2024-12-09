@@ -1,7 +1,14 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useTemplateRef } from 'vue';
+
+const logoRef = useTemplateRef<HTMLElement>('logo');
+
+defineExpose({ logoRef });
+</script>
 
 <template>
   <svg
+    ref="logo"
     viewBox="0 0 71 13"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"

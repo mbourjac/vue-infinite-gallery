@@ -66,6 +66,7 @@ onUnmounted(() => {
       :cover-position="coverPosition"
       :observer-target="workRef"
       :is-reversed="index % 2 === 1"
+      :initial-animation-delay="index * 0.2"
       @mouse-enter-project="handleMouseEnterProject"
       @mouse-leave-project="handleMouseLeaveProject"
     />

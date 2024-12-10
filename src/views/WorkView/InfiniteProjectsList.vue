@@ -6,17 +6,19 @@ import { createHorizontalLoop } from '@/lib/gsap';
 import type { Position, Project } from '@/types';
 import ProjectCover from './ProjectCover.vue';
 
-const { observerTarget, isReversed } = defineProps<{
+const { observerTarget, isReversed, initialAnimationDelay } = defineProps<{
   projects: Project[];
   hoveredProject: Project | null;
   coverPosition: Position;
   observerTarget: HTMLElement | null;
   isReversed?: boolean;
+  initialAnimationDelay: number;
 }>();
 
 const emit = defineEmits(['mouseEnterProject', 'mouseLeaveProject']);
 
 const projectRefs = useTemplateRef('list-item');
+const containerRefs = useTemplateRef<HTMLElement[] | null>('container');
 
 let gsapContext: gsap.Context | null = null;
 
@@ -26,6 +28,18 @@ onMounted(() => {
   if (!projects) return;
 
   gsapContext = gsap.context(() => {
+    gsap.fromTo(
+      containerRefs.value,
+      { yPercent: 100 },
+      {
+        yPercent: 0,
+        duration: 1.2,
+        delay: initialAnimationDelay,
+        ease: 'custom2',
+        stagger: 0.05,
+      }
+    );
+
     const loop = createHorizontalLoop(projects, { repeat: -1 });
     const slow = gsap.to(loop, { timeScale: 0, duration: 0.5 });
 
@@ -74,20 +88,27 @@ onUnmounted(() => {
     >
       <RouterLink
         :to="{ name: 'project', params: { slug: project.id } }"
-        class="mx-[2vw] grid grid-flow-col whitespace-nowrap"
+        class="block overflow-hidden"
       >
-        <h2 class="text-[5vw] font-bold leading-none">
-          {{ project.title }}
-        </h2>
-        <ul class="flex flex-col">
-          <li
-            v-for="(tag, index) in project.tags"
-            :key="index"
-            class="text-[1vw] leading-none"
-          >
-            {{ tag }}
-          </li>
-        </ul>
+        <div
+          ref="container"
+          :class="[
+            'mx-[2vw] grid grid-flow-col overflow-hidden whitespace-nowrap',
+          ]"
+        >
+          <h2 class="text-[5vw] font-bold leading-none">
+            {{ project.title }}
+          </h2>
+          <ul class="flex flex-col">
+            <li
+              v-for="(tag, index) in project.tags"
+              :key="index"
+              class="text-[1vw] leading-none"
+            >
+              {{ tag }}
+            </li>
+          </ul>
+        </div>
       </RouterLink>
     </li>
     <ProjectCover

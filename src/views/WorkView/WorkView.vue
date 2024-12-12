@@ -4,6 +4,7 @@ import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 import { useProjectGroups } from '@/composables/use-project-groups';
 import type { Project } from '@/types';
 import { useLenis } from '@/composables/use-lenis';
+import TransitionPanel from '@/components/TransitionPanel.vue';
 
 const { projectGroups } = useProjectGroups();
 const { injectLenis } = useLenis();
@@ -53,6 +54,7 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <TransitionPanel />
   <main
     ref="work"
     @mousemove="updateCursorPosition"

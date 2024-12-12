@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import InfiniteGallery from '@/views/HomeView/InfiniteGallery.vue';
 import TheLogo from '@/components/TheLogo.vue';
+import TransitionPanel from '@/components/TransitionPanel.vue';
 import gsap from 'gsap';
 import { onMounted, useTemplateRef } from 'vue';
 
@@ -16,6 +17,7 @@ onMounted(() => {
 </script>
 
 <template>
+  <TransitionPanel />
   <main>
     <div class="fixed inset-0 flex h-screen w-full items-center justify-center">
       <h1 class="text-[10vw] font-bold uppercase">

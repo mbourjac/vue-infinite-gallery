@@ -9,6 +9,8 @@ import Observer from 'gsap/Observer';
 gsap.registerPlugin(ScrollTrigger, CustomEase, Observer);
 
 CustomEase.create('custom1', '.16,1,.3,1');
+CustomEase.create('custom2', '.04,.64,.17,1');
+CustomEase.create('custom3', '.4,0,0,1');
 </script>
 
 <template>

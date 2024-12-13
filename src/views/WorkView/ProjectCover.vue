@@ -49,7 +49,7 @@ const onLeave = (element: RendererElement, done: () => void) => {
     :css="false"
   >
     <div
-      v-if="url"
+      v-if="url && position.x !== 0 && position.y !== 0"
       class="pointer-events-none absolute aspect-[4/5] w-64 overflow-hidden rounded-2xl"
       :style="{
         top: `${position.y}px`,
